@@ -1,4 +1,5 @@
 ﻿using Metalcoin.Core.Dtos.Request;
+using Metalcoin.Core.Enums;
 using Metalcoin.Core.Interfaces.Repositories;
 using Metalcoin.Core.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -21,12 +22,33 @@ namespace MetalCoin.Api.Controllers
         [Route("todos")]
         public async Task<ActionResult> ObterTodosCupons() {
             var listaCupons = await _cuponsRepository.ObterTodos();
-            
+
             if (listaCupons.Count == 0) {
                 return NoContent();
             }
 
             return Ok(listaCupons);
+        }
+        [HttpGet]
+        [Route("ativos")]
+        public async Task<ActionResult> BuscarCuponsstatus(TipoStatus status){
+            var listaCuponsAtivos = await _cuponsRepository.ObterPorStatus(status);
+            if (listaCuponsAtivos == null) {
+                return BadRequest("Não encontrado");
+            }
+            return Ok(listaCuponsAtivos);
+        }
+
+        [HttpGet]
+        [Route("buscarUmCupons")]
+        public async Task<ActionResult> ObterUmCupom(Guid id)
+        {
+            var cupom = await _cuponsRepository.ObterPorId(id);
+            if (cupom == null)
+            {
+                return BadRequest("Cupom não encontrado");
+            }
+            return Ok(cupom);
         }
 
         [HttpPost]

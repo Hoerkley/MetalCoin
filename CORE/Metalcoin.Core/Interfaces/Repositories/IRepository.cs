@@ -1,4 +1,5 @@
 ﻿using Metalcoin.Core.Abstracts;
+using Metalcoin.Core.Enums;
 
 namespace Metalcoin.Core.Interfaces.Repositories
 {
