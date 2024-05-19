@@ -1,4 +1,6 @@
 ﻿using Metalcoin.Core.Abstracts;
+using Metalcoin.Core.Domain;
+using Metalcoin.Core.Enums;
 using Metalcoin.Core.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
 

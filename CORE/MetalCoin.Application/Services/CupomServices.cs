@@ -8,14 +8,14 @@ namespace MetalCoin.Application.Services
 {
     public class CupomServices : ICupomServices
     {
-        private readonly ICuponsRepository _CupomRepository;
+        private readonly ICuponsRepository _cupomRepository;
         public CupomServices(ICuponsRepository repository) {
-            _CupomRepository = repository;
+            _cupomRepository = repository;
         }
 
         public async Task<CuponsResponse> AtualizarCupom(AtualizarCupomRequest cupom)
         {
-            var cupomDb = await _CupomRepository.ObterPorId(cupom.Id);
+            var cupomDb = await _cupomRepository.ObterPorId(cupom.Id);
             cupomDb.Codigo = cupom.Codigo;
             cupomDb.Descricao = cupom.Descricao;
             cupomDb.Desconto = cupom.Desconto;
@@ -24,7 +24,7 @@ namespace MetalCoin.Application.Services
             cupomDb.Status = cupom.Status;
             cupomDb.DataValidade = cupom.DataValidade;
 
-            await _CupomRepository.Atualizar(cupomDb);
+            await _cupomRepository.Atualizar(cupomDb);
             var response = new CuponsResponse
             {
                 Id = cupomDb.Id,
@@ -39,14 +39,28 @@ namespace MetalCoin.Application.Services
             return response;
         }
 
+        public async Task<CuponsResponse> atualizarStatusCupom(AtualizarCupomRequest atualizarCupom)
+        {
+            var statusDb = await _cupomRepository.ObterPorId(atualizarCupom.Id);
+           
+            statusDb.Status = atualizarCupom.Status;
+
+            await _cupomRepository.Atualizar(statusDb);
+            var response = new CuponsResponse
+            {
+                Status = statusDb.Status,
+            };
+            return response;
+        }
+
         public async Task<CuponsResponse> CadastrarCupons(CadastrarCupunsRequest cupom) {
 
-            //var cupomExiste = await _CupomRepository.BuscarPorNomeCupom(cupom.Codigo);
+            var cupomExiste = await _cupomRepository.BuscarPorCodigoCupom(cupom.Codigo);
 
-            //if (cupomExiste == null)
-            //{
-            //    return null;
-            //}
+            if (cupomExiste == null)
+            {
+                return null;
+            }
 
             var cupomEntidade = new Cupom
            {
@@ -59,7 +73,7 @@ namespace MetalCoin.Application.Services
                DataValidade = cupom.DataValidade
            };
            
-            await _CupomRepository.Adicionar(cupomEntidade);
+            await _cupomRepository.Adicionar(cupomEntidade);
 
             var response = new CuponsResponse
             {
@@ -77,11 +91,11 @@ namespace MetalCoin.Application.Services
 
         public async Task<bool> DeletarCupons(Guid id)
         {
-           var cupom = await _CupomRepository.ObterPorId(id);
+           var cupom = await _cupomRepository.ObterPorId(id);
             if (cupom == null) {
                 return false;
             }
-            await _CupomRepository.Remover(id);
+            await _cupomRepository.Remover(id);
             return true;
         }
     }

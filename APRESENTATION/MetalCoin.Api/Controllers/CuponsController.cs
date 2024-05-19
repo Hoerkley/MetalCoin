@@ -1,4 +1,5 @@
 ﻿using Metalcoin.Core.Dtos.Request;
+using Metalcoin.Core.Enums;
 using Metalcoin.Core.Interfaces.Repositories;
 using Metalcoin.Core.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -21,16 +22,37 @@ namespace MetalCoin.Api.Controllers
         [Route("todos")]
         public async Task<ActionResult> ObterTodosCupons() {
             var listaCupons = await _cuponsRepository.ObterTodos();
-            
+
             if (listaCupons.Count == 0) {
                 return NoContent();
             }
 
             return Ok(listaCupons);
         }
+        [HttpGet]
+        [Route("ObterPorStatus")]
+        public async Task<ActionResult> BuscarCuponsstatus(TipoStatus status){
+            var listaCuponsAtivos = await _cuponsRepository.ObterPorStatus(status);
+            if (listaCuponsAtivos == null) {
+                return BadRequest("Não encontrado");
+            }
+            return Ok(listaCuponsAtivos);
+        }
+
+        [HttpGet]
+        [Route("buscarUmCupom")]
+        public async Task<ActionResult> ObterUmCupom(Guid id)
+        {
+            var cupom = await _cuponsRepository.ObterPorId(id);
+            if (cupom == null)
+            {
+                return BadRequest("Cupom não encontrado");
+            }
+            return Ok(cupom);
+        }
 
         [HttpPost]
-        [Route("/cadastrar")]
+        [Route("cadastrar")]
         public async Task<ActionResult> CadastarCupons([FromBody] CadastrarCupunsRequest cadastrarCupuns){
             if (cadastrarCupuns == null) {
                 return BadRequest("informe o cupom"); 
@@ -48,13 +70,23 @@ namespace MetalCoin.Api.Controllers
                 return BadRequest("Nenhum valor encontrado");
             }
 
-            var response = await _cupomServices.AtualizarCupom(atualizarCupom);
+            var response = await _cupomServices.atualizarStatusCupom(atualizarCupom);
+            return Ok(response);
+        }
+        [HttpPatch]
+        [Route("AtualizarStatus")]
+        public async Task<ActionResult> Atualizarstatus([FromBody] AtualizarCupomRequest atualizarStatus)
+        {
+
+            if (atualizarStatus == null) {
+                return BadRequest("Não existe este cupom");
+            }
+            var response = await _cupomServices.atualizarStatusCupom(atualizarStatus);
             return Ok(response);
         }
 
-
         [HttpDelete]
-        [Route("deletar/{id:guid}")]
+        [Route("deletar")]
         public async Task<ActionResult> RemoverCupom(Guid id){
             if (id == Guid.Empty) {
                 return BadRequest("Id não encontrado");
